@@ -112,7 +112,7 @@ extension ASAuthorizationAppleIDProvider: SIWAProvider {
 
 // MARK: - REDUCER
 extension Reducer where ActionType == SIWAAction, StateType == SIWAState {
-    public static let status = Reducer { action, state in
+    public static let swa = Reducer { action, state in
         var state = state
         switch action {
             case let .status(result):
