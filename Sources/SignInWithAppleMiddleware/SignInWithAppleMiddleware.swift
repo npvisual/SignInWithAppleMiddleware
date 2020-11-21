@@ -135,6 +135,14 @@ extension Reducer where ActionType == SIWAAction, StateType == SIWAState {
         switch action {
             case let .status(result):
                 state.authState = result
+            case let .authenticated(cred, _, _):
+                state.identityToken = cred.identityToken
+                state.authorizationCode = cred.authorizationCode
+                state.state = cred.state
+                state.user = cred.user
+                state.fullName = cred.fullName
+                state.email = cred.email
+                state.realUserStatus = SIWAState.RealUserStatus.init(rawValue: cred.realUserStatus.rawValue)
             default: state = .empty
         }
         return state
