@@ -6,7 +6,7 @@ import Combine
 import SwiftRex
 
 // MARK: - ACTIONS
-//sourcery: Prism
+//sourcery: Prism, imports = ["AuthenticationServices"]
 public enum SIWAAction {
     case getStatus(String)
     case authenticated(ASAuthorizationAppleIDCredential, String, String)

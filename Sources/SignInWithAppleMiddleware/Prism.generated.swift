@@ -10,6 +10,7 @@ import UIKit
 import AppKit
 #endif
 
+import AuthenticationServices
 extension SIWAAction {
     public var getStatus: String? {
         get {
