@@ -9,6 +9,7 @@ import SwiftRex
 //sourcery: Prism
 public enum SIWAAction {
     case getStatus(String)
+    case authenticated(ASAuthorizationAppleIDCredential, String, String)
     case status(SIWAState)
     case error(Error)
 }

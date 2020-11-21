@@ -26,6 +26,21 @@ extension SIWAAction {
         self.getStatus != nil
     }
 
+    public var authenticated: (ASAuthorizationAppleIDCredential, String, String)? {
+        get {
+            guard case let .authenticated(associatedValue0, associatedValue1, associatedValue2) = self else { return nil }
+            return (associatedValue0, associatedValue1, associatedValue2)
+        }
+        set {
+            guard case .authenticated = self, let newValue = newValue else { return }
+            self = .authenticated(newValue.0, newValue.1, newValue.2)
+        }
+    }
+
+    public var isAuthenticated: Bool {
+        self.authenticated != nil
+    }
+
     public var status: SIWAState? {
         get {
             guard case let .status(associatedValue0) = self else { return nil }
