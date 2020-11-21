@@ -42,7 +42,7 @@ extension SIWAAction {
         self.authenticated != nil
     }
 
-    public var status: SIWAState? {
+    public var status: SIWAState.AuthenticationState? {
         get {
             guard case let .status(associatedValue0) = self else { return nil }
             return (associatedValue0)

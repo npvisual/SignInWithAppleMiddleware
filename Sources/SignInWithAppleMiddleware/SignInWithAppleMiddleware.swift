@@ -10,15 +10,33 @@ import SwiftRex
 public enum SIWAAction {
     case getStatus(String)
     case authenticated(ASAuthorizationAppleIDCredential, String, String)
-    case status(SIWAState)
+    case status(SIWAState.AuthenticationState)
     case error(Error)
 }
 
 // MARK: - STATE
-public enum SIWAState: Int, Equatable {
-    case authenticated
-    case loggedOut
-    case unknown
+public struct SIWAState: Equatable {
+    public var authState: AuthenticationState = .undefined
+    public var identityToken: Data? = nil
+    public var authorizationCode: Data? = nil
+    public var state: String? = nil
+    public var user: String? = nil
+    
+    public var fullName: PersonNameComponents? = nil
+    public var email: String? = nil
+    public var realUserStatus: RealUserStatus? = nil
+    
+    public enum AuthenticationState: Int, Equatable {
+        case authenticated
+        case loggedOut
+        case undefined
+    }
+    
+    public enum RealUserStatus: Int, Equatable {
+        case unsupported = 0, unknown, real
+    }
+    
+    public static let empty: SIWAState = .init()
 }
 
 // MARK: - ERROR
@@ -28,7 +46,7 @@ public enum SIWAError: Error {
 
 // MARK: - PROTOCOL
 public protocol SIWAProvider: ASAuthorizationProvider {
-    func getCredentialState(userID: String) -> AnyPublisher<SIWAState, SIWAError>
+    func getCredentialState(userID: String) -> AnyPublisher<SIWAState.AuthenticationState, SIWAError>
 }
 
 // MARK: - MIDDLEWARE
@@ -81,12 +99,12 @@ extension ASAuthorizationAppleIDProvider: SIWAProvider {
     
     private static let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "SIWAProviderImpl")
 
-    public func getCredentialState(userID: String) -> AnyPublisher<SIWAState, SIWAError> {
+    public func getCredentialState(userID: String) -> AnyPublisher<SIWAState.AuthenticationState, SIWAError> {
         return Future() { promise in
             self.getCredentialState(
                 forUserID: userID,
                 completion: { state, error in
-                    var result: SIWAState
+                    var result: SIWAState.AuthenticationState
                     os_log("Credential state for : %s",
                            log: ASAuthorizationAppleIDProvider.logger,
                            type: .debug,
@@ -96,7 +114,7 @@ extension ASAuthorizationAppleIDProvider: SIWAProvider {
                     } else {
                         switch state {
                             case .authorized: result = .authenticated
-                            case .notFound, .transferred: result = .unknown
+                            case .notFound, .transferred: result = .undefined
                             case .revoked: result = .loggedOut
                             @unknown default:
                                 return promise(.failure(.UnknownCredentialState))
@@ -116,8 +134,8 @@ extension Reducer where ActionType == SIWAAction, StateType == SIWAState {
         var state = state
         switch action {
             case let .status(result):
-                state = result
-            default: state = .unknown
+                state.authState = result
+            default: state = .empty
         }
         return state
     }
