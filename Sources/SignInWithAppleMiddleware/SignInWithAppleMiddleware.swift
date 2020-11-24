@@ -144,7 +144,10 @@ extension Reducer where ActionType == SIWAAction, StateType == SIWAState {
                 state.fullName = cred.fullName
                 state.email = cred.email
                 state.realUserStatus = SIWAState.RealUserStatus.init(rawValue: cred.realUserStatus.rawValue)
-            default: state = .empty
+            case .getStatus:
+                break
+            case .error:
+                state = .empty
         }
         return state
     }
