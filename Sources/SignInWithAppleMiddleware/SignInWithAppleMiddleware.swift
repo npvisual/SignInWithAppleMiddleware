@@ -136,6 +136,7 @@ extension Reducer where ActionType == SIWAAction, StateType == SIWAState {
             case let .status(result):
                 state.authState = result
             case let .authenticated(cred, _, _):
+                state.authState = .authenticated
                 state.identityToken = cred.identityToken
                 state.authorizationCode = cred.authorizationCode
                 state.state = cred.state
